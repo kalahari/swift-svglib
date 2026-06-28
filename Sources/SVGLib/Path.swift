@@ -34,9 +34,15 @@ private func arcSweepAndLargeArcFlag(from: Point, to: Point, center: Point, cloc
     return (sweep, abs(sweep) > .pi ? 1 : 0)
 }
 
-/// Builds an SVG path with fillet arcs inserted at all non-tangent junctions, including the
-/// M-point junction between the close segment and the first drawn segment for closed paths.
-private func buildPathWithFillets(segments: [PathSegment], close: Bool, radius: Double) -> String? {
+/// Builds an SVG path with fillet arcs inserted at selected junctions.
+///
+/// `radiusFor` is called with a point index (matching the `segments` array index) and returns
+/// the fillet radius at that corner, or `nil`/0 for no fillet. Index 0 addresses the
+/// M-point junction between the close segment and the first drawn segment (closed paths only);
+/// indices 1…n address the interior corners in order.
+private func buildPathWithFillets(
+    segments: [PathSegment], close: Bool, radiusFor: (Int) -> Double?
+) -> String? {
     var pts: [Point] = []
     for seg in segments {
         let pt: Point?
@@ -86,8 +92,8 @@ private func buildPathWithFillets(segments: [PathSegment], close: Bool, radius: 
         return squaredDistance(ta, P) <= squaredDistance(tb, P) ? ta : tb
     }
 
-    // Attempts to compute a fillet at the junction between prev.to and curr.from.
-    func tryFillet(_ prev: DrawSeg, _ curr: DrawSeg) -> (
+    // Attempts to compute a fillet of the given radius at the junction between prev.to and curr.from.
+    func tryFillet(_ prev: DrawSeg, _ curr: DrawSeg, radius: Double) -> (
         t1: Point, t2: Point, center: Point, cw: Bool
     )? {
         let P = prev.to
@@ -128,12 +134,13 @@ private func buildPathWithFillets(segments: [PathSegment], close: Bool, radius: 
     var result: [DrawSeg] = []
     for i in 0..<drawSegs.count {
         var curr = drawSegs[i]
-        if !result.isEmpty, let fr = tryFillet(result[result.count - 1], curr) {
+        if !result.isEmpty, let r = radiusFor(i), r > 0,
+           let fr = tryFillet(result[result.count - 1], curr, radius: r) {
             result[result.count - 1].to = fr.t1
             result.append(
                 DrawSeg(
                     from: fr.t1, to: fr.t2,
-                    kind: .arc(center: fr.center, radius: radius, clockwise: fr.cw)))
+                    kind: .arc(center: fr.center, radius: r, clockwise: fr.cw)))
             curr.from = fr.t2
         }
         result.append(curr)
@@ -141,13 +148,14 @@ private func buildPathWithFillets(segments: [PathSegment], close: Bool, radius: 
 
     // For closed paths, also fillet the M-point junction between the close segment and the first
     // drawn segment. The fillet arc is inserted at position 0 and becomes the new path start (M).
-    if close, result.count >= 2, let fr = tryFillet(result[result.count - 1], result[0]) {
+    if close, result.count >= 2, let r = radiusFor(0), r > 0,
+       let fr = tryFillet(result[result.count - 1], result[0], radius: r) {
         result[result.count - 1].to = fr.t1
         result[0].from = fr.t2
         result.insert(
             DrawSeg(
                 from: fr.t1, to: fr.t2,
-                kind: .arc(center: fr.center, radius: radius, clockwise: fr.cw)), at: 0)
+                kind: .arc(center: fr.center, radius: r, clockwise: fr.cw)), at: 0)
     }
 
     guard let first = result.first else { return nil }
@@ -174,20 +182,33 @@ private func buildPathWithFillets(segments: [PathSegment], close: Bool, radius: 
 /// The first segment's endpoint opens the path with `M`; each subsequent segment appends
 /// `L` (line) or `A` (arc). Returns `nil` if any segment contains a `nil` endpoint.
 ///
-/// When `filletRadius` is provided and greater than zero, a circular fillet arc of that radius
-/// is inserted at each junction where consecutive segments are not tangent. Line–line,
-/// line–arc, and arc–line junctions are supported; arc–arc junctions are left sharp.
-/// For closed paths, the junction where the close segment meets the first drawn segment is also filleted.
+/// **Uniform fillets** — pass `filletRadius` to round every non-tangent corner with the same radius.
+///
+/// **Per-corner fillets** — pass `filletRadii` to round only selected corners, each with its own
+/// radius. The dictionary key is the point index in `segments`: key `1` is the first interior
+/// corner (between segments 0 and 1), key `2` the second, and so on. Key `0` addresses the
+/// closing corner of a closed path (where the `Z` segment rejoins the start). Corners absent
+/// from the dictionary are left sharp. When `filletRadii` is provided it takes full control;
+/// `filletRadius` is ignored.
+///
+/// Line–line, line–arc, and arc–line junctions are supported; arc–arc junctions are always left sharp.
 ///
 /// - Parameters:
 ///   - segments: Ordered list of path segments describing the outline.
 ///   - close: When `true` (default), appends `Z` to close the path.
-///   - filletRadius: Optional fillet radius in SVG units. Ignored when `nil` or ≤ 0.
-public func buildPath(segments: [PathSegment], close: Bool = true, filletRadius: Double? = nil)
-    -> String?
-{
+///   - filletRadius: Uniform fillet radius applied to every corner. Ignored when `nil` or ≤ 0,
+///     or when `filletRadii` is provided.
+///   - filletRadii: Per-corner fillet radii keyed by point index. When non-nil, overrides
+///     `filletRadius` entirely. Entries with a value ≤ 0 are treated as no fillet.
+public func buildPath(
+    segments: [PathSegment], close: Bool = true,
+    filletRadius: Double? = nil, filletRadii: [Int: Double]? = nil
+) -> String? {
+    if let radii = filletRadii, segments.count >= 3 {
+        return buildPathWithFillets(segments: segments, close: close) { radii[$0] }
+    }
     if let r = filletRadius, r > 0, segments.count >= 3 {
-        return buildPathWithFillets(segments: segments, close: close, radius: r)
+        return buildPathWithFillets(segments: segments, close: close) { _ in r }
     }
 
     var parts: [String] = []
