@@ -5,7 +5,7 @@ import Foundation
 /// Formats a Double as a 2-decimal-place string suitable for SVG coordinate attributes.
 public func svgCoord(_ v: Double) -> String { String(format: "%.2f", v) }
 
-/// Wraps SVG content in a root `<svg>` element with a square viewBox.
+/// Wraps SVG content in a root `<svg>` element with a rectangular viewBox.
 /// - Parameters:
 ///   - content: The SVG markup to embed inside the root element.
 ///   - height: The height of the canvas in pixels. Defaults to 1024.

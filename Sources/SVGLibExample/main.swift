@@ -31,14 +31,14 @@ let arcParts = zones.enumerated().map { i, z in
 }
 
 // ── Pointer ───────────────────────────────────────────────────────────────────
-// A triangle pointing at 60% along the arc, with its tip at the arc inner edge
+// A triangle pointing at 60% along the arc, with its tip past the outer edge
 // and its base straddling the center.
 
 let fraction: Double = 0.60
 let pointerColor = hexRGB(0.45, 0.12, 0.08)
 
-let tip      = svgPtAtArcFraction(fraction, r: arc.radius - thickness / 2 - 8, arc: arc)
-let baseCenter = svgPtAtArcFraction(fraction, r: -(arc.radius * 0.15), arc: arc)
+let tip      = svgPtAtArcFraction(fraction, r: arc.radius + thickness / 2 + thickness, arc: arc)
+let baseCenter = svgPtAtArcFraction(fraction, r: -(arc.radius * 0.2), arc: arc)
 let spine    = Line(p0: tip, p1: baseCenter)
 let baseL    = offsetLine(line: spine, distance:  14).p1
 let baseR    = offsetLine(line: spine, distance: -14).p1
