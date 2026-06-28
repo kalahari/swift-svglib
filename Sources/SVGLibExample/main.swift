@@ -31,26 +31,22 @@ let arcParts = zones.enumerated().map { i, z in
 }
 
 // ── Pointer ───────────────────────────────────────────────────────────────────
-// A tapered shape built from the common tangents of a small tip circle and a
-// wider tail circle, positioned at 60% along the arc.
+// A triangle pointing at 60% along the arc, with its tip at the arc inner edge
+// and its base straddling the center.
 
 let fraction: Double = 0.60
-let pointerColor = hexRGB(0.95, 0.95, 0.95)
+let pointerColor = hexRGB(0.45, 0.12, 0.08)
 
-let tipPt   = svgPtAtArcFraction(fraction, r: arc.radius - thickness / 2 - 8, arc: arc)
-let tailPt  = svgPtAtArcFraction(fraction, r: -(arc.radius * 0.22), arc: arc)
-let tipC    = Circle(center: tipPt,  radius: 4)
-let tailC   = Circle(center: tailPt, radius: 14)
-
-guard let tangents = commonTangents(c1: tailC, c2: tipC), tangents.count >= 2 else {
-    fatalError("Could not find pointer tangents")
-}
+let tip      = svgPtAtArcFraction(fraction, r: arc.radius - thickness / 2 - 8, arc: arc)
+let baseCenter = svgPtAtArcFraction(fraction, r: -(arc.radius * 0.15), arc: arc)
+let spine    = Line(p0: tip, p1: baseCenter)
+let baseL    = offsetLine(line: spine, distance:  14).p1
+let baseR    = offsetLine(line: spine, distance: -14).p1
 
 let pointerSegments: [PathSegment] = [
-    .line(to: tangents[0].p0),
-    .arc(center: tailPt,  radius: tailC.radius, clockwise: true,  to: tangents[1].p0),
-    .line(to: tangents[1].p1),
-    .arc(center: tipPt,   radius: tipC.radius,  clockwise: true,  to: tangents[0].p1),
+    .line(to: tip),
+    .line(to: baseL),
+    .line(to: baseR),
 ]
 
 guard let pointerPath = buildPath(segments: pointerSegments) else {
