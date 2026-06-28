@@ -29,6 +29,10 @@ jobs:
             --hosting-base-path swift-svglib \
             --output-path ./docs
 
+      - name: Add root redirect
+        run: |
+          echo '<html><head><meta http-equiv="refresh" content="0; url=documentation/svglib/"></head></html>' > ./docs/index.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
