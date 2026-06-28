@@ -41,7 +41,9 @@ public func svgArc(_ arc: Arc, width: Double = 2.0, stroke: String = "black") ->
 /// Returns a new triangle inset by `d` pixels from all three edges.
 /// Each vertex is displaced along its interior angle bisector by `d / sin(halfAngle)`.
 /// - Parameters:
-///   - p0, p1, p2: Triangle vertices in any winding order.
+///   - p0: First triangle vertex.
+///   - p1: Second triangle vertex.
+///   - p2: Third triangle vertex.
 ///   - d: Inset distance in SVG units. Should be less than the triangle's inradius.
 /// - Returns: Tuple of inset vertices (q0, q1, q2) matching input order.
 public func insetTriangle(p0: Point, p1: Point, p2: Point, d: Double)

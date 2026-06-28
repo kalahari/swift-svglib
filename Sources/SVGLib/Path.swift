@@ -274,6 +274,8 @@ public func arcPath(t0: Double, t1: Double, arc: Arc) -> String {
 ///   - arc: The arc defining center, radius, start angle, and sweep. `arc.radius` is the centre-line radius of the band.
 ///   - thickness: Total radial width of the band. Inner radius is `arc.radius - thickness/2`, outer is `arc.radius + thickness/2`.
 ///   - fill: CSS colour string for the fill (e.g. `"#FF0000"` or `"red"`).
+///   - roundStart: When `true`, caps the start end of the band with a semicircular arc.
+///   - roundEnd: When `true`, caps the end end of the band with a semicircular arc.
 public func arcShape(
     t0: Double, t1: Double, arc: Arc, thickness: Double, fill: String,
     roundStart: Bool = false, roundEnd: Bool = false
