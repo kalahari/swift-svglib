@@ -20,6 +20,16 @@ targets: [
 ]
 ```
 
+## Example
+
+The repo includes a runnable example that generates a simple gauge SVG — colored arc zones, a tapered pointer, and a hub circle.
+
+```
+swift run SVGLibExample
+```
+
+Output is written to `output/gauge.svg` in the current directory.
+
 ## Usage
 
 ### Colors
