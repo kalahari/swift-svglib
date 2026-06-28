@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-28
+
 ### Added
 - `filletRadii: [Int: Double]` parameter on `buildPath` for per-corner fillet radii with
   individualized values. Key `1` is the first interior corner, key `0` is the closing corner
