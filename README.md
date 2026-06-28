@@ -116,6 +116,8 @@ writeSVG(svg, name: "output.svg", directory: "assets")
 
 ## API reference
 
+Full API documentation is published at **https://kalahari.github.io/swift-svglib/documentation/svglib/**.
+
 | File | Contents |
 |------|----------|
 | `Color.swift` | `hexRGB`, `hexGray` |
