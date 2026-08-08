@@ -123,7 +123,7 @@ Full API documentation is published at **https://kalahari.github.io/swift-svglib
 | `Color.swift` | `hexRGB`, `hexGray` |
 | `Geometry.swift` | `Point`, `Line`, `Circle`, `Arc`, `LineCoefficients`; `distance`, `midpoint`, `lineLength`, `lineIntersection`, `offsetLine`, `extendLine`, `lineCircleIntersections`, `commonTangents`, `filletCenter`, `areTangent`, `arcAngleDegrees`, `svgPointAtAngle`, `svgPtAtArcFraction` |
 | `Path.swift` | `PathSegment`, `buildPath`, `arcPath`, `arcShape` |
-| `Shapes.swift` | `svgCircle`, `svgLine`, `svgArc`, `insetTriangle` |
+| `Shapes.swift` | `svgCircle`, `svgLine`, `svgCapsule`, `svgArc`, `svgArcCapsule`, `insetTriangle` |
 | `Document.swift` | `svgCoord`, `svgDoc`, `writeSVG` |
 
 ## License

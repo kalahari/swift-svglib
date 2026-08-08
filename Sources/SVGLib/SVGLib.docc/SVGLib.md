@@ -23,7 +23,9 @@ per-corner radii.
 - ``svgDoc(_:height:width:)``
 - ``svgCircle(center:r:fill:)``
 - ``svgLine(_:width:stroke:)``
+- ``svgCapsule(_:width:fill:)``
 - ``svgArc(_:width:stroke:)``
+- ``svgArcCapsule(_:width:fill:)``
 - ``svgCoord(_:)``
 - ``writeSVG(_:name:directory:)``
 
