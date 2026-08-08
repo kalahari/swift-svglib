@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- `svgCapsule` filled path shape centered on a line segment with semicircular end caps.
+- `svgArcCapsule` filled path shape centered on a circular arc with semicircular end caps.
+
 ## [1.1.0] - 2026-06-28
 
 ### Added
