@@ -53,7 +53,7 @@ let center = Point(x: 512, y: 512)
 let ring = Arc(center: center, radius: 400, start: 270, sweep: 360)
 
 // Point on the arc at 25% of its sweep
-let pt = svgPtAtArcFraction(0.25, arc: ring)
+let pt = pointAtArcFraction(0.25, arc: ring)
 
 // Offset a line 10 units to the right
 let shifted = offsetLine(line: Line(p0: pt, to: center), distance: 10)
@@ -78,7 +78,7 @@ let d = buildPath(segments: segments, filletRadius: 20)
 
 ### Arc shapes
 
-`arcShape` produces a filled, closed arc band between two fractions of an `Arc`, with optional rounded caps:
+`renderArcShape` produces a filled, closed arc band between two fractions of an `Arc`, with optional rounded caps:
 
 ```swift
 let arc = Arc(center: Point(x: 512, y: 512), radius: 380, start: 160, sweep: 220)
@@ -90,7 +90,7 @@ let zones: [(Double, Double, String)] = [
     (0.85, 1.0, hexRGB(0.9, 0.2, 0.15)),
 ]
 let parts = zones.enumerated().map { i, z in
-    arcShape(t0: z.0, t1: z.1, arc: arc, thickness: 48, fill: z.2,
+    renderArcShape(t0: z.0, t1: z.1, arc: arc, thickness: 48, fill: z.2,
              roundStart: i == 0, roundEnd: i == zones.count - 1)
 }
 ```
@@ -98,9 +98,10 @@ let parts = zones.enumerated().map { i, z in
 ### Basic shapes
 
 ```swift
-svgCircle(center: Point(x: 512, y: 512), r: 30, fill: hexGray(0.4))
-svgLine(Line(p0: a, p1: b), width: 3, stroke: "#FF0000")
-svgArc(arc, width: 2, stroke: hexGray(0.6))
+renderPath(d: "M 0 0 L 100 0 L 50 80 Z", fill: hexRGB(0.2, 0.4, 0.7))
+renderCircle(center: Point(x: 512, y: 512), r: 30, fill: hexGray(0.4))
+renderLine(Line(p0: a, p1: b), width: 3, stroke: "#FF0000")
+renderArc(arc, width: 2, stroke: hexGray(0.6))
 ```
 
 ### Document output
@@ -108,11 +109,11 @@ svgArc(arc, width: 2, stroke: hexGray(0.6))
 Wrap content in an `<svg>` root element and write it to disk:
 
 ```swift
-let svg = svgDoc(parts.joined(separator: "\n"), width: 1024, height: 1024)
-writeSVG(svg, name: "output.svg", directory: "assets")
+let svg = renderDocument(parts, width: 1024, height: 1024)
+writeDocument(svg, name: "output.svg", directory: "assets")
 ```
 
-`writeSVG` creates intermediate directories as needed and exits with code 1 on failure.
+`writeDocument` creates intermediate directories as needed and exits with code 1 on failure.
 
 ## API reference
 
@@ -121,10 +122,10 @@ Full API documentation is published at **https://kalahari.github.io/swift-svglib
 | File | Contents |
 |------|----------|
 | `Color.swift` | `hexRGB`, `hexGray` |
-| `Geometry.swift` | `Point`, `Line`, `Circle`, `Arc`, `LineCoefficients`; `distance`, `midpoint`, `lineLength`, `lineIntersection`, `offsetLine`, `extendLine`, `lineCircleIntersections`, `commonTangents`, `filletCenter`, `areTangent`, `arcAngleDegrees`, `svgPointAtAngle`, `svgPtAtArcFraction` |
-| `Path.swift` | `PathSegment`, `buildPath`, `arcPath`, `arcShape` |
-| `Shapes.swift` | `svgCircle`, `svgLine`, `svgCapsule`, `svgArc`, `svgArcCapsule`, `insetTriangle` |
-| `Document.swift` | `svgCoord`, `svgDoc`, `writeSVG` |
+| `Geometry.swift` | `Point`, `Line`, `Circle`, `Arc`, `LineCoefficients`; `distance`, `midpoint`, `lineLength`, `lineIntersection`, `offsetLine`, `extendLine`, `lineCircleIntersections`, `commonTangents`, `filletCenter`, `areTangent`, `arcAngleDegrees`, `pointAtAngle`, `pointAtArcFraction`, `insetTriangle` |
+| `Path.swift` | `PathSegment`, `buildPath`, `arcPath` |
+| `Shapes.swift` | `renderPath`, `renderCircle`, `renderLine`, `renderCapsule`, `renderArc`, `renderArcShape`, `renderArcCapsule` |
+| `Document.swift` | `formatCoord`, `renderDocument`, `writeDocument` |
 
 ## License
 

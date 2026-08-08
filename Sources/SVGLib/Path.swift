@@ -159,15 +159,15 @@ private func buildPathWithFillets(
     }
 
     guard let first = result.first else { return nil }
-    var parts = ["M \(svgCoord(first.from.x)) \(svgCoord(first.from.y))"]
+    var parts = ["M \(formatCoord(first.from.x)) \(formatCoord(first.from.y))"]
     for seg in result {
         switch seg.kind {
         case .line:
-            parts.append("L \(svgCoord(seg.to.x)) \(svgCoord(seg.to.y))")
+            parts.append("L \(formatCoord(seg.to.x)) \(formatCoord(seg.to.y))")
         case .arc(let center, let segRadius, let clockwise):
             let (_, largeArc) = arcSweepAndLargeArcFlag(from: seg.from, to: seg.to, center: center, clockwise: clockwise)
             parts.append(
-                "A \(svgCoord(segRadius)) \(svgCoord(segRadius)) 0 \(largeArc) \(clockwise ? 1 : 0) \(svgCoord(seg.to.x)) \(svgCoord(seg.to.y))"
+                "A \(formatCoord(segRadius)) \(formatCoord(segRadius)) 0 \(largeArc) \(clockwise ? 1 : 0) \(formatCoord(seg.to.x)) \(formatCoord(seg.to.y))"
             )
         }
     }
@@ -226,20 +226,20 @@ public func buildPath(
         guard let pt = destination else { return nil }
 
         if index == 0 {
-            parts.append("M \(svgCoord(pt.x)) \(svgCoord(pt.y))")
+            parts.append("M \(formatCoord(pt.x)) \(formatCoord(pt.y))")
         } else {
             switch segment {
             case .move:
                 continue
             case .line:
-                parts.append("L \(svgCoord(pt.x)) \(svgCoord(pt.y))")
+                parts.append("L \(formatCoord(pt.x)) \(formatCoord(pt.y))")
 
             case .arc(let center, let radius, let clockwise, _):
                 guard let from = currentPoint else { return nil }
                 let (_, largeArc) = arcSweepAndLargeArcFlag(from: from, to: pt, center: center, clockwise: clockwise)
                 let sweepFlag = clockwise ? 1 : 0
                 parts.append(
-                    "A \(svgCoord(radius)) \(svgCoord(radius)) 0 \(largeArc) \(sweepFlag) \(svgCoord(pt.x)) \(svgCoord(pt.y))"
+                    "A \(formatCoord(radius)) \(formatCoord(radius)) 0 \(largeArc) \(sweepFlag) \(formatCoord(pt.x)) \(formatCoord(pt.y))"
                 )
             }
         }
@@ -258,58 +258,10 @@ public func buildPath(
 ///   - t1: End position as an arc fraction (1 = arc end, ~4:30 on a clock face).
 ///   - arc: The arc defining center, radius, start angle, and sweep.
 public func arcPath(t0: Double, t1: Double, arc: Arc) -> String {
-    let p0 = svgPtAtArcFraction(t0, arc: arc)
-    let p1 = svgPtAtArcFraction(t1, arc: arc)
+    let p0 = pointAtArcFraction(t0, arc: arc)
+    let p1 = pointAtArcFraction(t1, arc: arc)
     let sweep = (t1 - t0) * arc.sweep
     let largeArc = sweep > 180 ? 1 : 0
     return
-        "M \(svgCoord(p0.x)) \(svgCoord(p0.y)) A \(svgCoord(arc.radius)) \(svgCoord(arc.radius)) 0 \(largeArc) 1 \(svgCoord(p1.x)) \(svgCoord(p1.y))"
-}
-
-/// Returns a filled SVG `<path>` element for a closed arc band between two arc fractions.
-/// The shape is bounded by two concentric arcs (inner and outer) joined by radial lines at each end.
-/// - Parameters:
-///   - t0: Start position as an arc fraction (0 = arc start, ~7:30 on a clock face).
-///   - t1: End position as an arc fraction (1 = arc end, ~4:30 on a clock face).
-///   - arc: The arc defining center, radius, start angle, and sweep. `arc.radius` is the centre-line radius of the band.
-///   - thickness: Total radial width of the band. Inner radius is `arc.radius - thickness/2`, outer is `arc.radius + thickness/2`.
-///   - fill: CSS colour string for the fill (e.g. `"#FF0000"` or `"red"`).
-///   - roundStart: When `true`, caps the start end of the band with a semicircular arc.
-///   - roundEnd: When `true`, caps the end end of the band with a semicircular arc.
-public func arcShape(
-    t0: Double, t1: Double, arc: Arc, thickness: Double, fill: String,
-    roundStart: Bool = false, roundEnd: Bool = false
-) -> String {
-    let outerR = arc.radius + thickness / 2
-    let innerR = arc.radius - thickness / 2
-    let capR = thickness / 2
-
-    let outerStart = svgPtAtArcFraction(t0, r: outerR, arc: arc)
-    let outerEnd = svgPtAtArcFraction(t1, r: outerR, arc: arc)
-    let innerEnd = svgPtAtArcFraction(t1, r: innerR, arc: arc)
-    let innerStart = svgPtAtArcFraction(t0, r: innerR, arc: arc)
-    let capEndCenter = svgPtAtArcFraction(t1, r: arc.radius, arc: arc)
-    let capStartCenter = svgPtAtArcFraction(t0, r: arc.radius, arc: arc)
-
-    var segments: [PathSegment] = [
-        .line(to: outerStart),
-        .arc(center: arc.center, radius: outerR, clockwise: true, to: outerEnd),
-    ]
-
-    if roundEnd {
-        segments.append(.arc(center: capEndCenter, radius: capR, clockwise: true, to: innerEnd))
-    } else {
-        segments.append(.line(to: innerEnd))
-    }
-
-    segments.append(.arc(center: arc.center, radius: innerR, clockwise: false, to: innerStart))
-
-    if roundStart {
-        segments.append(.arc(center: capStartCenter, radius: capR, clockwise: true, to: outerStart))
-    }
-
-    guard let d = buildPath(segments: segments) else {
-        fatalError("arcShape: failed to build path for t0=\(t0) t1=\(t1)")
-    }
-    return "<path d=\"\(d)\" fill=\"\(fill)\" stroke=\"none\"/>"
+        "M \(formatCoord(p0.x)) \(formatCoord(p0.y)) A \(formatCoord(arc.radius)) \(formatCoord(arc.radius)) 0 \(largeArc) 1 \(formatCoord(p1.x)) \(formatCoord(p1.y))"
 }

@@ -24,7 +24,7 @@ let zones: [(t0: Double, t1: Double, color: String)] = [
 ]
 
 let arcParts = zones.enumerated().map { i, z in
-    arcShape(
+    renderArcShape(
         t0: z.t0, t1: z.t1, arc: arc, thickness: thickness, fill: z.color,
         roundStart: i == 0, roundEnd: i == zones.count - 1
     )
@@ -37,8 +37,8 @@ let arcParts = zones.enumerated().map { i, z in
 let fraction: Double = 0.60
 let pointerColor = hexRGB(0.45, 0.12, 0.08)
 
-let tip      = svgPtAtArcFraction(fraction, r: arc.radius + thickness / 2 + thickness, arc: arc)
-let baseCenter = svgPtAtArcFraction(fraction, r: -(arc.radius * 0.2), arc: arc)
+let tip      = pointAtArcFraction(fraction, r: arc.radius + thickness / 2 + thickness, arc: arc)
+let baseCenter = pointAtArcFraction(fraction, r: -(arc.radius * 0.2), arc: arc)
 let spine    = Line(p0: tip, p1: baseCenter)
 let baseL    = offsetLine(line: spine, distance:  14).p1
 let baseR    = offsetLine(line: spine, distance: -14).p1
@@ -56,16 +56,16 @@ guard let pointerPath = buildPath(segments: pointerSegments) else {
 // ── Hub ───────────────────────────────────────────────────────────────────────
 
 let hubParts = [
-    svgCircle(center: center, r: 18, fill: hexGray(0.35)),
-    svgCircle(center: center, r:  8, fill: hexGray(0.65)),
+    renderCircle(center: center, r: 18, fill: hexGray(0.35)),
+    renderCircle(center: center, r:  8, fill: hexGray(0.65)),
 ]
 
 // ── Compose and write ─────────────────────────────────────────────────────────
 
 let allParts =
     arcParts
-    + ["<path d=\"\(pointerPath)\" fill=\"\(pointerColor)\" stroke=\"none\"/>"]
+    + [renderPath(d: pointerPath, fill: pointerColor)]
     + hubParts
 
-let svg = svgDoc(allParts.joined(separator: "\n"), height: Int(size), width: Int(size))
-writeSVG(svg, name: "gauge.svg", directory: outputDir)
+let svg = renderDocument(allParts, height: Int(size), width: Int(size))
+writeDocument(svg, name: "gauge.svg", directory: outputDir)

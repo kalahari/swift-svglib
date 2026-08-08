@@ -174,19 +174,19 @@ public func arcAngleDegrees(_ t: Double, arc: Arc) -> Double {
 ///   - deg: Angle in degrees (y-down clockwise convention).
 ///   - r: Radius from the centre point.
 ///   - center: Centre of the canvas in SVG coordinates.
-public func svgPointAtAngle(deg: Double, r: Double, center: Point) -> Point {
+public func pointAtAngle(deg: Double, r: Double, center: Point) -> Point {
     let a = deg * .pi / 180
     return Point(x: center.x + r * cos(a), y: center.y + r * sin(a))
 }
 
 /// Returns the SVG point at a given arc fraction and radius.
-/// Converts the fraction to degrees via `arcAngleDegrees`, then to an SVG coordinate via `svgPointAtAngle`.
+/// Converts the fraction to degrees via `arcAngleDegrees`, then to an SVG coordinate via `pointAtAngle`.
 /// - Parameters:
 ///   - t: Arc fraction, where 0 is the arc start and 1 is the arc end.
 ///   - r: Radius from the centre point. Defaults to `arc.radius`.
 ///   - arc: The arc defining center, start angle, and sweep.
-public func svgPtAtArcFraction(_ t: Double, r: Double? = nil, arc: Arc) -> Point {
-    svgPointAtAngle(deg: arcAngleDegrees(t, arc: arc), r: r ?? arc.radius, center: arc.center)
+public func pointAtArcFraction(_ t: Double, r: Double? = nil, arc: Arc) -> Point {
+    pointAtAngle(deg: arcAngleDegrees(t, arc: arc), r: r ?? arc.radius, center: arc.center)
 }
 
 // MARK: - Intersection
@@ -383,4 +383,45 @@ public func areTangent(line: Line, arc: Arc) -> Bool {
     let dot = dx * rx + dy * ry
     let scale = (dx * dx + dy * dy) * (rx * rx + ry * ry)
     return scale > 0 && dot * dot / scale < 1e-10
+}
+
+// MARK: - Triangle
+
+/// Returns a new triangle inset by `d` pixels from all three edges.
+/// Each vertex is displaced along its interior angle bisector by `d / sin(halfAngle)`.
+/// - Parameters:
+///   - p0: First triangle vertex.
+///   - p1: Second triangle vertex.
+///   - p2: Third triangle vertex.
+///   - d: Inset distance in SVG units. Should be less than the triangle's inradius.
+/// - Returns: Tuple of inset vertices (q0, q1, q2) matching input order.
+public func insetTriangle(p0: Point, p1: Point, p2: Point, d: Double)
+    -> (q0: Point, q1: Point, q2: Point)
+{
+    let centroid = Point(
+        x: (p0.x + p1.x + p2.x) / 3,
+        y: (p0.y + p1.y + p2.y) / 3)
+
+    func insetVtx(prev: Point, curr: Point, next: Point) -> Point {
+        let e0 = unitVector(from: curr, to: prev)
+        let e1 = unitVector(from: curr, to: next)
+        let sumX = e0.x + e1.x
+        let sumY = e0.y + e1.y
+        let bLen = (sumX * sumX + sumY * sumY).squareRoot()
+        var bx = sumX / bLen
+        var by = sumY / bLen
+        if bx * (centroid.x - curr.x) + by * (centroid.y - curr.y) < 0 {
+            bx = -bx
+            by = -by
+        }
+        let sinHalf = abs(bx * e1.y - by * e1.x)
+        let offset = d / max(sinHalf, 0.001)
+        return Point(x: curr.x + bx * offset, y: curr.y + by * offset)
+    }
+
+    return (
+        q0: insetVtx(prev: p2, curr: p0, next: p1),
+        q1: insetVtx(prev: p0, curr: p1, next: p2),
+        q2: insetVtx(prev: p1, curr: p2, next: p0)
+    )
 }

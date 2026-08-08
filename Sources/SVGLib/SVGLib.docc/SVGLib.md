@@ -15,19 +15,23 @@ per-corner radii.
 
 - ``buildPath(segments:close:filletRadius:filletRadii:)``
 - ``arcPath(t0:t1:arc:)``
-- ``arcShape(t0:t1:arc:thickness:fill:roundStart:roundEnd:)``
 - ``PathSegment``
 
-### SVG Document and Elements
+### Rendering
 
-- ``svgDoc(_:height:width:)``
-- ``svgCircle(center:r:fill:)``
-- ``svgLine(_:width:stroke:)``
-- ``svgCapsule(_:width:fill:)``
-- ``svgArc(_:width:stroke:)``
-- ``svgArcCapsule(_:width:fill:)``
-- ``svgCoord(_:)``
-- ``writeSVG(_:name:directory:)``
+- ``renderPath(d:fill:)``
+- ``renderCircle(center:r:fill:)``
+- ``renderLine(_:width:stroke:)``
+- ``renderCapsule(_:width:fill:)``
+- ``renderArc(_:width:stroke:)``
+- ``renderArcCapsule(_:width:fill:)``
+- ``renderArcShape(t0:t1:arc:thickness:fill:roundStart:roundEnd:)``
+
+### Document Output
+
+- ``renderDocument(_:height:width:)``
+- ``formatCoord(_:)``
+- ``writeDocument(_:name:directory:)``
 
 ### Geometry Types
 
@@ -43,8 +47,8 @@ per-corner radii.
 - ``distance(_:_:)``
 - ``squaredDistance(_:_:)``
 - ``lineLength(_:)``
-- ``svgPointAtAngle(deg:r:center:)``
-- ``svgPtAtArcFraction(_:r:arc:)``
+- ``pointAtAngle(deg:r:center:)``
+- ``pointAtArcFraction(_:r:arc:)``
 - ``arcAngleDegrees(_:arc:)``
 
 ### Line and Circle Operations

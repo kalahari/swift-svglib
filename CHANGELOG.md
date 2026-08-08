@@ -6,8 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
-- `svgCapsule` filled path shape centered on a line segment with semicircular end caps.
-- `svgArcCapsule` filled path shape centered on a circular arc with semicircular end caps.
+- `renderPath(d:fill:)` for wrapping a path `d` string in a filled `<path>` element.
+- `renderCapsule` filled path shape centered on a line segment with semicircular end caps.
+- `renderArcCapsule` filled path shape centered on a circular arc with semicircular end caps.
+
+### Changed
+- Renamed markup emitters to use a `render` verb: `svgCircle` → `renderCircle`,
+  `svgLine` → `renderLine`, `svgArc` → `renderArc`, `svgCapsule` → `renderCapsule`,
+  `svgArcCapsule` → `renderArcCapsule`, `arcShape` → `renderArcShape`.
+- Renamed document helpers: `svgCoord` → `formatCoord`, `svgDoc` → `renderDocument`,
+  `writeSVG` → `writeDocument`.
+- `renderDocument` accepts either a single content string or an array of strings joined with newlines.
+- Renamed geometry helpers: `svgPointAtAngle` → `pointAtAngle`,
+  `svgPtAtArcFraction` → `pointAtArcFraction`.
+- Moved `insetTriangle` from `Shapes.swift` to `Geometry.swift`.
+- Moved `renderArcShape` from `Path.swift` to `Shapes.swift`.
 
 ## [1.1.0] - 2026-06-28
 
