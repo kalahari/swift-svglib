@@ -5,18 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-08
+
+Breaking API rename: markup emitters use a `render` verb, document helpers drop the `svg` prefix, and geometry helpers are unprefixed. Call sites using 1.x names need updating.
+
 ### Added
 - `renderPath(d:fill:)` for wrapping a path `d` string in a filled `<path>` element.
 - `renderCapsule` filled path shape centered on a line segment with semicircular end caps.
 - `renderArcCapsule` filled path shape centered on a circular arc with semicircular end caps.
+- `renderDocument` overload that accepts an array of strings joined with newlines.
 
 ### Changed
-- Renamed markup emitters to use a `render` verb: `svgCircle` → `renderCircle`,
-  `svgLine` → `renderLine`, `svgArc` → `renderArc`, `svgCapsule` → `renderCapsule`,
+- Renamed markup emitters: `svgCircle` → `renderCircle`, `svgLine` → `renderLine`,
+  `svgArc` → `renderArc`, `svgCapsule` → `renderCapsule`,
   `svgArcCapsule` → `renderArcCapsule`, `arcShape` → `renderArcShape`.
 - Renamed document helpers: `svgCoord` → `formatCoord`, `svgDoc` → `renderDocument`,
   `writeSVG` → `writeDocument`.
-- `renderDocument` accepts either a single content string or an array of strings joined with newlines.
 - Renamed geometry helpers: `svgPointAtAngle` → `pointAtAngle`,
   `svgPtAtArcFraction` → `pointAtArcFraction`.
 - Moved `insetTriangle` from `Shapes.swift` to `Geometry.swift`.
