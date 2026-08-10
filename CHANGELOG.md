@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- `GuideGeometry` protocol and `renderGuide` overloads for `Point`, `Line`, `Circle`, and `Arc`
+  so construction geometry can be drawn as stroke-only overlays.
+- `renderDocument` `guides`, `guideColor`, and `guideStrokeWidth` parameters (defaults:
+  no guides, magenta `#FF00FF`, width `1.0`) for overlaying guides while iterating on an image.
+
 ## [2.0.0] - 2026-08-08
 
 Breaking API rename: markup emitters use a `render` verb, document helpers drop the `svg` prefix, and geometry helpers are unprefixed. Call sites using 1.x names need updating.

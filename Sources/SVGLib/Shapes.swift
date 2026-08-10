@@ -129,3 +129,101 @@ public func renderArcCapsule(_ arc: Arc, width: Double = 2.0, fill: String = "bl
         roundStart: true, roundEnd: true
     )
 }
+
+// MARK: - Construction guides
+
+/// Default stroke colour for construction guides drawn via `renderGuide` / `renderDocument`.
+public let defaultGuideColor = "#FF00FF"
+
+/// Default stroke width for construction guides drawn via `renderGuide` / `renderDocument`.
+public let defaultGuideStrokeWidth: Double = 1.0
+
+/// A geometric primitive that can be drawn as a stroke-only construction guide.
+public protocol GuideGeometry {
+    /// Returns SVG markup rendering this geometry as a construction guide.
+    /// - Parameters:
+    ///   - color: CSS colour string for the stroke.
+    ///   - strokeWidth: Stroke width in SVG units.
+    func renderGuide(color: String, strokeWidth: Double) -> String
+}
+
+extension Point: GuideGeometry {
+    /// Returns SVG markup for this point as a small crosshair construction guide.
+    public func renderGuide(color: String, strokeWidth: Double) -> String {
+        let arm = max(4.0, strokeWidth * 4)
+        let h = Line(
+            p0: Point(x: x - arm, y: y),
+            p1: Point(x: x + arm, y: y))
+        let v = Line(
+            p0: Point(x: x, y: y - arm),
+            p1: Point(x: x, y: y + arm))
+        return renderLine(h, width: strokeWidth, stroke: color) + "\n"
+            + renderLine(v, width: strokeWidth, stroke: color)
+    }
+}
+
+extension Line: GuideGeometry {
+    /// Returns SVG markup for this line as a construction guide.
+    public func renderGuide(color: String, strokeWidth: Double) -> String {
+        renderLine(self, width: strokeWidth, stroke: color)
+    }
+}
+
+extension Circle: GuideGeometry {
+    /// Returns SVG markup for this circle as a stroke-only construction guide.
+    public func renderGuide(color: String, strokeWidth: Double) -> String {
+        "<circle cx=\"\(formatCoord(center.x))\" cy=\"\(formatCoord(center.y))\" r=\"\(formatCoord(radius))\" fill=\"none\" stroke=\"\(color)\" stroke-width=\"\(formatCoord(strokeWidth))\"/>"
+    }
+}
+
+extension Arc: GuideGeometry {
+    /// Returns SVG markup for this arc as a construction guide.
+    public func renderGuide(color: String, strokeWidth: Double) -> String {
+        renderArc(self, width: strokeWidth, stroke: color)
+    }
+}
+
+/// Returns SVG markup for a point drawn as a small crosshair construction guide.
+/// - Parameters:
+///   - point: The point to mark.
+///   - color: CSS colour string for the stroke. Defaults to `defaultGuideColor`.
+///   - strokeWidth: Stroke width in SVG units. Defaults to `defaultGuideStrokeWidth`.
+public func renderGuide(
+    _ point: Point, color: String = defaultGuideColor, strokeWidth: Double = defaultGuideStrokeWidth
+) -> String {
+    point.renderGuide(color: color, strokeWidth: strokeWidth)
+}
+
+/// Returns SVG markup for a line drawn as a construction guide.
+/// - Parameters:
+///   - line: The line segment to draw.
+///   - color: CSS colour string for the stroke. Defaults to `defaultGuideColor`.
+///   - strokeWidth: Stroke width in SVG units. Defaults to `defaultGuideStrokeWidth`.
+public func renderGuide(
+    _ line: Line, color: String = defaultGuideColor, strokeWidth: Double = defaultGuideStrokeWidth
+) -> String {
+    line.renderGuide(color: color, strokeWidth: strokeWidth)
+}
+
+/// Returns SVG markup for a circle drawn as a stroke-only construction guide.
+/// - Parameters:
+///   - circle: The circle to outline.
+///   - color: CSS colour string for the stroke. Defaults to `defaultGuideColor`.
+///   - strokeWidth: Stroke width in SVG units. Defaults to `defaultGuideStrokeWidth`.
+public func renderGuide(
+    _ circle: Circle, color: String = defaultGuideColor,
+    strokeWidth: Double = defaultGuideStrokeWidth
+) -> String {
+    circle.renderGuide(color: color, strokeWidth: strokeWidth)
+}
+
+/// Returns SVG markup for an arc drawn as a construction guide.
+/// - Parameters:
+///   - arc: The arc to draw.
+///   - color: CSS colour string for the stroke. Defaults to `defaultGuideColor`.
+///   - strokeWidth: Stroke width in SVG units. Defaults to `defaultGuideStrokeWidth`.
+public func renderGuide(
+    _ arc: Arc, color: String = defaultGuideColor, strokeWidth: Double = defaultGuideStrokeWidth
+) -> String {
+    arc.renderGuide(color: color, strokeWidth: strokeWidth)
+}

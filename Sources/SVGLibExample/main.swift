@@ -69,3 +69,17 @@ let allParts =
 
 let svg = renderDocument(allParts, height: Int(size), width: Int(size))
 writeDocument(svg, name: "gauge.svg", directory: outputDir)
+
+// Same image with construction guides overlaid — useful while iterating.
+let guides: [any GuideGeometry] = [
+    arc,
+    Circle(center: center, radius: arc.radius),
+    spine,
+    tip,
+    baseCenter,
+    baseL,
+    baseR,
+]
+let svgWithGuides = renderDocument(
+    allParts, height: Int(size), width: Int(size), guides: guides)
+writeDocument(svgWithGuides, name: "gauge-guides.svg", directory: outputDir)

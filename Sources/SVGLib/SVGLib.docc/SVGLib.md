@@ -27,9 +27,16 @@ per-corner radii.
 - ``renderArcCapsule(_:width:fill:)``
 - ``renderArcShape(t0:t1:arc:thickness:fill:roundStart:roundEnd:)``
 
+### Construction Guides
+
+- ``GuideGeometry``
+- ``defaultGuideColor``
+- ``defaultGuideStrokeWidth``
+- ``renderGuide(_:color:strokeWidth:)``
+
 ### Document Output
 
-- ``renderDocument(_:height:width:)``
+- ``renderDocument(_:height:width:guides:guideColor:guideStrokeWidth:)``
 - ``formatCoord(_:)``
 - ``writeDocument(_:name:directory:)``
 
