@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-08-09
+
 ### Added
 - `GuideGeometry` protocol and `renderGuide` overloads for `Point`, `Line`, `Circle`, and `Arc`
   so construction geometry can be drawn as stroke-only overlays.
