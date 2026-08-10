@@ -113,6 +113,14 @@ let svg = renderDocument(parts, width: 1024, height: 1024)
 writeDocument(svg, name: "output.svg", directory: "assets")
 ```
 
+While iterating on an image, pass geometry as overlays. Guides are drawn on top in magenta at 1px by default; omit `guides:` (or pass `[]`) for the finished image:
+
+```swift
+let svg = renderDocument(
+    parts, width: 1024, height: 1024,
+    guides: [arc, spine, tip, Circle(center: center, radius: 210)])
+```
+
 `writeDocument` creates intermediate directories as needed and exits with code 1 on failure.
 
 ## API reference
@@ -124,7 +132,7 @@ Full API documentation is published at **https://kalahari.github.io/swift-svglib
 | `Color.swift` | `hexRGB`, `hexGray` |
 | `Geometry.swift` | `Point`, `Line`, `Circle`, `Arc`, `LineCoefficients`; `distance`, `midpoint`, `lineLength`, `lineIntersection`, `offsetLine`, `extendLine`, `lineCircleIntersections`, `commonTangents`, `filletCenter`, `areTangent`, `arcAngleDegrees`, `pointAtAngle`, `pointAtArcFraction`, `insetTriangle` |
 | `Path.swift` | `PathSegment`, `buildPath`, `arcPath` |
-| `Shapes.swift` | `renderPath`, `renderCircle`, `renderLine`, `renderCapsule`, `renderArc`, `renderArcShape`, `renderArcCapsule` |
+| `Shapes.swift` | `renderPath`, `renderCircle`, `renderLine`, `renderCapsule`, `renderArc`, `renderArcShape`, `renderArcCapsule`; `GuideGeometry`, `renderGuide`, `defaultGuideColor`, `defaultGuideStrokeWidth` |
 | `Document.swift` | `formatCoord`, `renderDocument`, `writeDocument` |
 
 ## License
